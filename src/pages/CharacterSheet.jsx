@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import StatsContainer from '../components/character/StatContainer';
 import QuestCard from '../components/quests/QuestCard';
 import { Button } from '../components/ui/Button';
+import CurrentFocusSection from '../components/quests/CurrentFocusSection';
+
 
 const CharacterSheet = () => {
   // Main state for our character data
@@ -67,6 +69,26 @@ const CharacterSheet = () => {
     }));
   };
 
+
+// Add this new handler function with your other handlers
+const handleSetCurrentSPA = (questId, spaId) => {
+  setCharacterData(prev => ({
+    ...prev,
+    quests: prev.quests.map(quest => {
+      if (quest.id === questId) {
+        // Only update SPAs in the specific quest
+        return {
+          ...quest,
+          spas: quest.spas.map(spa => ({
+            ...spa,
+            current: spa.id === spaId ? !spa.current : spa.current  // Toggle current status
+          }))
+        };
+      }
+      return quest;
+    })
+  }));
+};  
   // Handler for deleting quests and SPAs
 const handleDeleteQuest = (questId) => {
   setCharacterData(prev => ({
@@ -169,7 +191,7 @@ const handleDeleteSPA = (questId, spaId) => {
         <div className="mb-6">
           <StatsContainer stats={characterData.stats} />
         </div>
-
+        <CurrentFocusSection quests={characterData.quests} />
         {/* Quests Section */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold">Quests</h2>
@@ -190,30 +212,19 @@ const handleDeleteSPA = (questId, spaId) => {
           </div>
 
           {/* Quest List */}
-          {characterData.quests.map(quest => (
-            <QuestCard
-              key={quest.id}
-              title={quest.title}
-              spas={quest.spas}
-              onAddSPA={(spaData) => handleAddSPA(quest.id, spaData)}
-              onCompleteSPA={(spaId) => handleCompleteSPA(quest.id, spaId)}
-              onSetCurrentSPA={(spaId) => {
-                // Handle setting current SPA
-                setCharacterData(prev => ({
-                  ...prev,
-                  quests: prev.quests.map(q => ({
-                    ...q,
-                    spas: q.spas.map(spa => ({
-                      ...spa,
-                      current: q.id === quest.id && spa.id === spaId
-                    }))
-                  }))
-                }));
-              }}
-              onDeleteQuest={() => handleDeleteQuest(quest.id)}
-              onDeleteSPA={(spaId) => handleDeleteSPA(quest.id, spaId)}
-            />
-          ))}
+{/* Quest List */}
+{characterData.quests.map(quest => (
+  <QuestCard
+    key={quest.id}
+    title={quest.title}
+    spas={quest.spas}
+    onAddSPA={(spaData) => handleAddSPA(quest.id, spaData)}
+    onCompleteSPA={(spaId) => handleCompleteSPA(quest.id, spaId)}
+    onSetCurrentSPA={(spaId) => handleSetCurrentSPA(quest.id, spaId)}
+    onDeleteQuest={() => handleDeleteQuest(quest.id)}
+    onDeleteSPA={(spaId) => handleDeleteSPA(quest.id, spaId)}
+  />
+))}
         </div>
       </div>
     </div>
