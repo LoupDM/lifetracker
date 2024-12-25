@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import SPAItem from './SPAItem';
+import {Trash2} from 'lucide-react';
 
-const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA }) => {
+const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA, onDeleteQuest, onDeleteSPA }) => {
   const [newSPA, setNewSPA] = useState({
     description: '',
     selectedStats: [],
@@ -19,9 +20,19 @@ const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA }) =>
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
+<CardHeader>
+  <div className="flex justify-between items-center">
+    <CardTitle>{title}</CardTitle>
+    <Button 
+      variant="default" 
+      size="small"
+      onClick={onDeleteQuest}
+      className="text-red-500 hover:text-red-700"
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
+  </div>
+</CardHeader>
       <CardContent>
         {/* SPA List */}
         {spas.map(spa => (
@@ -30,6 +41,7 @@ const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA }) =>
             {...spa}
             onComplete={() => onCompleteSPA(spa.id)}
             onSetCurrent={() => onSetCurrentSPA(spa.id)}
+            onDelete={() => onDeleteSPA(spa.id)}
           />
         ))}
 

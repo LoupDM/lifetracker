@@ -1,6 +1,6 @@
 // CharacterSheet.jsx
 import React, { useState, useEffect } from 'react';
-import StatsContainer from '../components/character/StatsContainer';
+import StatsContainer from '../components/character/StatContainer';
 import QuestCard from '../components/quests/QuestCard';
 import { Button } from '../components/ui/Button';
 
@@ -67,6 +67,29 @@ const CharacterSheet = () => {
     }));
   };
 
+  // Handler for deleting quests and SPAs
+const handleDeleteQuest = (questId) => {
+  setCharacterData(prev => ({
+    ...prev,
+    quests: prev.quests.filter(quest => quest.id !== questId)
+  }));
+};
+
+const handleDeleteSPA = (questId, spaId) => {
+  setCharacterData(prev => ({
+    ...prev,
+    quests: prev.quests.map(quest => {
+      if (quest.id === questId) {
+        // Filter out the SPA we want to delete
+        return {
+          ...quest,
+          spas: quest.spas.filter(spa => spa.id !== spaId)
+        };
+      }
+      return quest;
+    })
+  }));
+};
   // Handler for completing an SPA
   const handleCompleteSPA = (questId, spaId) => {
     setCharacterData(prev => {
@@ -165,6 +188,8 @@ const CharacterSheet = () => {
                   }))
                 }));
               }}
+              onDeleteQuest={() => handleDeleteQuest(quest.id)}
+              onDeleteSPA={(spaId) => handleDeleteSPA(quest.id, spaId)}
             />
           ))}
         </div>
