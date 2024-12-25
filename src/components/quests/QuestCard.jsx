@@ -5,45 +5,84 @@ import { Button } from '../ui/Button';
 import SPAItem from './SPAItem';
 import {Trash2} from 'lucide-react';
 
-const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA, onDeleteQuest, onDeleteSPA }) => {
+const QuestCard = ({ title, spas, onAddSPA, onCompleteSPA, onSetCurrentSPA, onDeleteQuest, onDeleteSPA, onEditQuest }) => {
   const [newSPA, setNewSPA] = useState({
     description: '',
     selectedStats: [],
     difficulty: 'easy'
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
 
   // Available stats that can be assigned to SPAs
   const availableStats = [
     'strength', 'endurance', 'vigor',
     'creativity', 'knowledge', 'wisdom'
   ];
-
+  const handleSaveEdit = () => {
+    if (editedTitle.trim()) {
+      onEditQuest(editedTitle.trim());  // We'll create this function next
+      setIsEditing(false);
+    }
+  };
   return (
     <Card>
 <CardHeader>
   <div className="flex justify-between items-center">
-    <CardTitle>{title}</CardTitle>
-    <Button 
-      variant="default" 
-      size="small"
-      onClick={onDeleteQuest}
-      className="text-red-500 hover:text-red-700"
-    >
-      <Trash2 className="h-4 w-4" />
-    </Button>
+    {isEditing ? (
+      // This is what shows when we're editing
+      <div className="flex gap-2 flex-1">
+        <input
+          type="text"
+          value={editedTitle}
+          onChange={(e) => setEditedTitle(e.target.value)}
+          className="flex-1 p-2 border-2 border-gray-300 rounded"
+          autoFocus
+        />
+        <Button size="small" variant="success" onClick={handleSaveEdit}>
+          Save
+        </Button>
+        <Button size="small" onClick={() => setIsEditing(false)}>
+          Cancel
+        </Button>
+      </div>
+    ) : (
+      // This is what shows when we're not editing
+      <>
+        <CardTitle>{title}</CardTitle>
+        <div className="flex gap-2">
+          <Button 
+            size="small"
+            variant="default"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </Button>
+          <Button 
+            variant="default" 
+            size="small"
+            onClick={onDeleteQuest}
+            className="text-red-500 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </>
+    )}
   </div>
 </CardHeader>
       <CardContent>
         {/* SPA List */}
         {spas.map(spa => (
-          <SPAItem
-            key={spa.id}
-            {...spa}
-            onComplete={() => onCompleteSPA(spa.id)}
-            onSetCurrent={() => onSetCurrentSPA(spa.id)}
-            onDelete={() => onDeleteSPA(spa.id)}
-          />
-        ))}
+  <SPAItem
+  key={spa.id}
+  {...spa}
+  onComplete={() => onCompleteSPA(spa.id)}
+  onSetCurrent={() => onSetCurrentSPA(spa.id)}
+  onDelete={() => onDeleteSPA(spa.id)}
+  onEdit={(editedData) => onEditSPA(spa.id, editedData)}  // Add this line
+/>
+))}
 
         {/* New SPA Form */}
         <div className="mt-4 p-3 border-2 border-gray-300">

@@ -74,7 +74,28 @@ const handleDeleteQuest = (questId) => {
     quests: prev.quests.filter(quest => quest.id !== questId)
   }));
 };
-
+const handleEditSPA = (questId, spaId, editedData) => {
+  setCharacterData(prev => ({
+    ...prev,
+    quests: prev.quests.map(quest => {
+      if (quest.id === questId) {
+        return {
+          ...quest,
+          spas: quest.spas.map(spa => {
+            if (spa.id === spaId) {
+              return {
+                ...spa,
+                ...editedData
+              };
+            }
+            return spa;
+          })
+        };
+      }
+      return quest;
+    })
+  }));
+};
 const handleDeleteSPA = (questId, spaId) => {
   setCharacterData(prev => ({
     ...prev,
@@ -115,6 +136,7 @@ const handleDeleteSPA = (questId, spaId) => {
           totalXP: (updatedStats[statName].totalXP || 0) + xpGain
         };
       });
+
 
       // Mark SPA as completed
       const updatedQuests = prev.quests.map(q => {
