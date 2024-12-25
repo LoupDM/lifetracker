@@ -4,9 +4,12 @@ import StatsContainer from '../components/character/StatContainer';
 import QuestCard from '../components/quests/QuestCard';
 import { Button } from '../components/ui/Button';
 import CurrentFocusSection from '../components/quests/CurrentFocusSection';
-
+import JournalSection from '../components/journal/JournalSection'; 
+import Tabs from '../components/layout/Tabs';  
 
 const CharacterSheet = () => {
+  // State for tabs
+  const [activeTab, setActiveTab] = useState('focus');
   // Main state for our character data
   const [characterData, setCharacterData] = useState(() => {
     // Try to load saved data, or use default values
@@ -29,6 +32,10 @@ const CharacterSheet = () => {
   useEffect(() => {
     localStorage.setItem('characterData', JSON.stringify(characterData));
   }, [characterData]);
+
+
+  // Function to render content based on active tab
+  
 
   // Handler for adding a new quest
   const handleAddQuest = (questTitle) => {
@@ -184,19 +191,28 @@ const handleDeleteSPA = (questId, spaId) => {
     });
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Stats Section */}
-        <div className="mb-6">
-          <StatsContainer stats={characterData.stats} />
+// Add the renderTabContent function here
+const renderTabContent = () => {
+  switch (activeTab) {
+    case 'focus':
+      return (
+        <div className="space-y-6">
+          <CurrentFocusSection quests={characterData.quests} />
         </div>
-        <CurrentFocusSection quests={characterData.quests} />
-        {/* Quests Section */}
+      );
+    
+    case 'stats':
+      return (
+        <div className="space-y-6">
+          <StatsContainer stats={characterData.stats} />
+          <JournalSection />
+        </div>
+      );
+    
+    case 'quests':
+      return (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold">Quests</h2>
-          
-          {/* New Quest Input */}
           <div className="flex gap-2 mb-4">
             <input
               type="text"
@@ -210,25 +226,37 @@ const handleDeleteSPA = (questId, spaId) => {
               }}
             />
           </div>
-
-          {/* Quest List */}
-{/* Quest List */}
-{characterData.quests.map(quest => (
-  <QuestCard
-    key={quest.id}
-    title={quest.title}
-    spas={quest.spas}
-    onAddSPA={(spaData) => handleAddSPA(quest.id, spaData)}
-    onCompleteSPA={(spaId) => handleCompleteSPA(quest.id, spaId)}
-    onSetCurrentSPA={(spaId) => handleSetCurrentSPA(quest.id, spaId)}
-    onDeleteQuest={() => handleDeleteQuest(quest.id)}
-    onDeleteSPA={(spaId) => handleDeleteSPA(quest.id, spaId)}
-  />
-))}
+          {characterData.quests.map(quest => (
+            <QuestCard
+              key={quest.id}
+              title={quest.title}
+              spas={quest.spas}
+              onAddSPA={(spaData) => handleAddSPA(quest.id, spaData)}
+              onCompleteSPA={(spaId) => handleCompleteSPA(quest.id, spaId)}
+              onSetCurrentSPA={(spaId) => handleSetCurrentSPA(quest.id, spaId)}
+              onDeleteQuest={() => handleDeleteQuest(quest.id)}
+              onDeleteSPA={(spaId) => handleDeleteSPA(quest.id, spaId)}
+            />
+          ))}
         </div>
-      </div>
+      );
+    
+    default:
+      return null;
+  }
+};
+
+return (
+  <div className="min-h-screen bg-gray-100 p-4">
+    <div className="max-w-6xl mx-auto">
+      <Tabs 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
+      {renderTabContent()}
     </div>
-  );
+  </div>
+);
 };
 
 export default CharacterSheet;
